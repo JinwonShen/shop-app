@@ -1,9 +1,9 @@
-import display from "./displayProducts.js";
-import fetchProducts from "./fetchProducts.js";
-import { setupStore } from "./store.js";
-import { getElement } from "./utils.js";
-import "./toggleSidebar.js";
-import "./cart/toggleCart.js";
+import display from "./src/displayProducts.js";
+import fetchProducts from "./src/fetchProducts.js";
+import { setupStore } from "./src/store.js";
+import { getElement } from "./src/utils.js";
+import "./src/toggleSidebar.js";
+import "./src/cart/toggleCart.js";
 
 // 비동기 요청을 위해 async/await를 사용
 const init = async () => {
