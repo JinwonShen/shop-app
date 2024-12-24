@@ -14,6 +14,7 @@ const cartTotalEl = getElement(".cart-total");
 
 let cart = getStorageItem("cart");
 
+// 장바구니에 추가하기
 export const addToCart = (id) => {
   let item = cart.find((cartItem) => cartItem.id === id);
 
@@ -35,8 +36,44 @@ export const addToCart = (id) => {
     const itemEl = items.find((value) => value.dataset.id === id);
     itemEl.textContent = amount;
   }
+
+  displayCartItemCount();
+
+  displayCartTotal();
+
+  setStorageItem("cart", cart);
+
+  openCart();
 };
 
+function displayCartItemsDOM() {
+  cart.forEach((cartItem) => {
+    addToCartDOM(cartItem);
+  });
+}
+
+// 장바구니 amount
+function displayCartItemCount() {
+  const amount = cart.reduce((acc, curr) => {
+    return (acc += curr.amount);
+  }, 0);
+  cartItemCountEl.textContent = amount;
+}
+
+// 장바구니 total
+function displayCartTotal() {
+  let total = cart.reduce((acc, curr) => {
+    return (acc += curr.price * curr.amount);
+  }, 0);
+
+  cartTotalEl.textContent = `Total: ${formatPrice(total)}`;
+}
+
+function removeItem(id) {
+  cart = cart.filter((cartItem) => cartItem.id !== id);
+}
+
+// 장바구니 상품갯수 +
 function increaseAmount(id) {
   let newAmount;
 
@@ -49,3 +86,60 @@ function increaseAmount(id) {
   });
   return newAmount;
 }
+
+// 장바구니 상품갯수 -
+function decreaseAmount(id) {
+  let newAmount;
+
+  cart = cart.map((cartItem) => {
+    if (cartItem.id === id) {
+      newAmount = cartItem.amount - 1;
+      cartItem = { ...cartItem, amount: newAmount };
+    }
+    return cartItem;
+  });
+  return newAmount;
+}
+
+function setupCartFunctionality() {
+  cartItemsEl.addEventListener("click", (e) => {
+    const element = e.target;
+    const parent = e.target.parentElement;
+    const id = e.target.dataset.id;
+    const parentID = e.target.parentElement.dataset.id;
+
+    // remove
+    if (element.classList.contains("cart-item-remove-btn")) {
+      removeItem(id);
+
+      element.parentElement.parentElement.remove();
+    }
+    // increase
+    if (parent.classList.contains("cart-item-increase-btn")) {
+      const newAmount = increaseAmount(parentID);
+      parent.nextElementSibling.textContent = newAmount;
+    }
+    // decrease
+    if (parent.classList.contains("cart-item-decrease-btn")) {
+      const newAmount = decreaseAmount(parentID);
+      if (newAmount === 0) {
+        removeItem(parentID);
+        parent.parentElement.parentElement.remove();
+      } else {
+        parent.previousElementSibling.textContent = newAmount;
+      }
+    }
+    displayCartItemCount();
+    displayCartTotal();
+    setStorageItem("cart", cart);
+  });
+}
+
+const init = () => {
+  displayCartItemCount();
+  displayCartTotal();
+  displayCartItemsDOM();
+  setupCartFunctionality();
+};
+
+init();
